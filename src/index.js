@@ -55,7 +55,19 @@ exports.getUserById = ({
 // Get media by its code
 exports.getMediaByCode = code => (
     fetch(`https://www.instagram.com/p/${code}/?__a=1`)
-        .then(res => res.json())
+        .then((res) => {
+            return res.json().then((data) => {
+                if (!data.graphql) {
+                    return generateError(404, 'Media not found');
+                }
+
+                if (!data.graphql.shortcode_media) {
+                    return generateError(404, 'Media not found');
+                }
+
+                return data.graphql.shortcode_media;
+            })
+        })
 )
 
 // Get storys for a user
