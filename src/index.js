@@ -14,10 +14,29 @@ const getHeaders = (headers, sessionid, userid) => {
     })
 }
 
+const generateError = (code, message) => {
+    return {
+        error: code,
+        message: message
+    };
+}
+
 // Grab a user by their username
 exports.getUserByUsername = username => (
     fetch(`https://www.instagram.com/${username}/?__a=1`)
-        .then(res => res.json())
+        .then((res) => {
+            return res.json().then((data) => {
+                if (!data.graphql) {
+                    return generateError(404, 'User not found');
+                }
+
+                if (!data.graphql.user) {
+                    return generateError(404, 'User not found');
+                }
+
+                return data.graphql.user;
+            })
+        })
 )
 
 // Get user info by id
